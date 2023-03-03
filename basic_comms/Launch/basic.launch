@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<launch>  
+
+    <group ns="grupo1">
+        <node pkg="turtlesim" type="turtlesim_node" name = "new_name"/>
+    </group>
+
+<node pkg="turtlesim" type="turtlesim_node" name = "new_name"/>
+<node pkg="turtlesim" type="turtle_teleop_key" name = "teleop"/>
+
+					<!-- Launch rqt_graph -->
+<node pkg="rqt_graph" type="rqt_graph" name="rqt_graph" />
+
+</launch>

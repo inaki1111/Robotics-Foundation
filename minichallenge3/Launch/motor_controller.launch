@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+
+    <node name="Serial_node" pkg="rosserial_python" type="serial_node.py">
+      <param name="port"	type="string"	value="/dev/ttyACM0"/> 
+    </node>
+
+
+                    <!-- Load parameters from yaml files -->
+                    
+    <rosparam file = "$(find minichallenge3)/config/motor_controller.yaml" command = "load"  /> 
+     
+
+                            <!-- Launch node -->
+
+    <node name="input" pkg="minichallenge3" type="input.py" output="screen"/>
+
+                                    <!-- Launch rqt_plot -->
+
+    <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot" output="screen"  args="/cmd_pwm"/>
+
+					<!-- Launch rqt_graph -->
+  	<node pkg="rqt_graph" type="rqt_graph" name="rqt_graph" />
+
+
+</launch>

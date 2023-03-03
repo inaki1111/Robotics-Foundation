@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<launch>
+
+                    <!-- Load parameters from yaml files -->
+                    
+    <rosparam file = "$(find pid_control)/config/setpoint_params.yaml" command = "load"  /> 
+    <rosparam file = "$(find pid_control)/config/system_params.yaml" command = "load"  />
+    <rosparam file = "$(find pid_control)/config/control_params.yaml" command = "load"  />  
+     
+
+                            <!-- Launch node -->
+
+    <node name="set_point" pkg="pid_control" type="set_point_generator.py" output="screen"/>
+
+    <node name="system" pkg="pid_control" type="system.py" output="screen"/>
+
+    <node name="control" pkg="pid_control" type="controller.py" output="screen"/>
+
+                                    <!-- Launch rqt_plot -->
+
+    <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot" output="screen"  args="/motor_output/output /motor_input/input /set_point/reference"/>
+
+					<!-- Launch rqt_graph -->
+  	<node pkg="rqt_graph" type="rqt_graph" name="rqt_graph" />
+
+
+
+</launch>
