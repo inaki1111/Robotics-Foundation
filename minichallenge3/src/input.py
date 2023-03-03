@@ -42,9 +42,8 @@ if __name__ == '__main__':
             pub.publish(pwm)
 
         elif type == "square":
-            # pwm = square(velocity,rospy.get_time())
-            pwm = 255 * np.sign(np.sin(rospy.get_time()))
-            if pwm < 0:
+            pwm = 255 * np.sign(np.sin(rospy.get_time())+(velocity/255))
+            if(pwm < 0):
                 pwm = 0
 
             pub.publish(pwm)
