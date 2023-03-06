@@ -1,6 +1,6 @@
-/*
- * rosserial PubSub Example
- * Prints "hello world!" and toggles led
+ /*
+ * rosserial Subscribe to a topic cmd_pwm to recieve the velocity of the motor
+ * 
  */
 
 #include <ros.h>
