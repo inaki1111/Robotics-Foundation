@@ -7,6 +7,7 @@
 #include <std_msgs/Float32.h>
 
 
+
 //Encoder #1
 const int pinCanalA=2;
 const int pinCanalB=4;
@@ -15,6 +16,12 @@ const int pinCanalB=4;
 const int motorPin1=11;
 const int motorPin2=10;
 
+
+
+// Variables para el cálculo de la velocidad
+volatile int encoderPos = 0;
+volatile unsigned long lastMicros = 0;
+volatile float rpm = 0.0;
 
 float dt=0.02;
 float tiempo=0;
@@ -67,14 +74,13 @@ ros::Subscriber<std_msgs::Float32> sub("/motor_input", &callback_motor_velocity)
 
 
 
-std_msgs::String str_msg;
-ros::Publisher chatter("motor_output", &str_msg);
+std_msgs::Float32 str_msg;
+ros::Publisher chatter("/motor_output", &str_msg);
 
-char hello[13] = "hello world!";
 
 void setup()
 {
-  //attachInterrupt(digitalPinToInterrupt(pinCanalA),Encoder,RISING);
+  attachInterrupt(digitalPinToInterrupt(pinCanalA),countPulses,RISING);
   pinMode(pinCanalA,INPUT);
   pinMode(pinCanalB,INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
@@ -87,7 +93,15 @@ void setup()
 
 void loop()
 {
-  str_msg.data = hello;
+    // Calcular la velocidad en RPM
+  unsigned long currentMicros = micros();
+  float elapsedTime = (currentMicros - lastMicros) / 1000000.0; // tiempo transcurrido en segundos
+  rpm = (encoderPos * 60.0) / (elapsedTime * 12.0); // 12 es el número de pulsos por vuelta del encoder
+
+  // Reiniciar el contador de pulsos y el temporizador
+  encoderPos = 0;
+  lastMicros = currentMicros;
+  str_msg.data = rpm;
   
   chatter.publish( &str_msg );
   nh.spinOnce();
@@ -95,45 +109,9 @@ void loop()
 }
 
 
-#define encoderPinA 2
-#define encoderPinB 3
-
-// Variables para el cálculo de la velocidad
-volatile int encoderPos = 0;
-volatile unsigned long lastMicros = 0;
-volatile float rpm = 0.0;
-
-void setup() {
-  // Configurar los pines del encoder como entradas
-  pinMode(encoderPinA, INPUT);
-  pinMode(encoderPinB, INPUT);
-
-  // Habilitar la interrupción de hardware en el pin 2 (encoderPinA)
-  attachInterrupt(digitalPinToInterrupt(encoderPinA), countPulses, RISING);
-  
-  // Iniciar la comunicación serial a una velocidad de 9600 bps
-  Serial.begin(9600);
-}
-
-void loop() {
-  // Calcular la velocidad en RPM
-  unsigned long currentMicros = micros();
-  float elapsedTime = (currentMicros - lastMicros) / 1000000.0; // tiempo transcurrido en segundos
-  rpm = (encoderPos * 60.0) / (elapsedTime * 12.0); // 12 es el número de pulsos por vuelta del encoder
-
-  // Imprimir la velocidad en la consola serial
-  Serial.print("Velocidad: ");
-  Serial.print(rpm);
-  Serial.println(" RPM");
-
-  // Reiniciar el contador de pulsos y el temporizador
-  encoderPos = 0;
-  lastMicros = currentMicros;
-}
-
 void countPulses() {
   // Leer el estado del canal B del encoder
-  int bState = digitalRead(encoderPinB);
+  int bState = digitalRead(pinCanalB);
 
   // Incrementar o decrementar el contador de pulsos en función del estado de los canales A y B
   if (bState == LOW) {
