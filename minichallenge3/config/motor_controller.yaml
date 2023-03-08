@@ -1,2 +1,2 @@
-type: "square"
-velocity: 0.5
+type: "step"
+velocity: -1
